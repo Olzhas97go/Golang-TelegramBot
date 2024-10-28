@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: quiz_bot
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    command: ["go", "run", "main.go"]
+    volumes:
+      - .:/app
+    networks:
+      - quiz_network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: quizdb
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - quiz_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: example
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql  
+    networks:
+      - quiz_network
+
+networks:
+  quiz_network:
+
+volumes:
+  mysql_data:
+  
